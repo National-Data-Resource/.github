@@ -10,6 +10,8 @@ The **National Data Resource (NDR)** is a programme led by [Digital Health and C
 
 The NDR underpins DHCW's vision of a **digital health and care record for every person in Wales**, supporting clinicians, analysts, researchers, and policymakers with the data they need, when they need it.
 
+NDR will make data easier to access and analyse in a safe, secure and ethical manner.
+
 ### Key components
 
 | Component | Description |
@@ -17,21 +19,7 @@ The NDR underpins DHCW's vision of a **digital health and care record for every 
 | **Care Data Repository (CDR)** | Central hub for Wales' health and care data, supporting clinical, operational, and research uses |
 | **National Data and Analytics Platform (NDAP)** | Analytics backbone enabling users to store, access, and analyse well-governed datasets at national scale |
 | **Secure Data Environment** | Facilitates safe, governed data sharing between health boards, academia, and industry |
-
----
-
-## GitHub GIG Cymru — NHS Wales National GitHub Service
-
-This organisation is part of **GitHub GIG Cymru**, the national GitHub Enterprise service for NHS Wales. "GIG Cymru" is the Welsh name for NHS Wales.
-
-GitHub GIG Cymru provides a collaborative home for analysts, developers, and data professionals across NHS Wales to:
-
-- 📦 **Share code** — analytics scripts, data pipelines, dashboards, and FHIR profiles
-- 🔁 **Promote reuse** — standardised tools and templates usable across all health boards
-- 🤝 **Collaborate** — peer review, version control, and cross-organisation teamwork
-- 🔒 **Stay secure** — enterprise-grade governance and access management aligned with NHS Wales policies
-
-Read more: [GitHub and how the NDR uses it](https://dhcw.nhs.wales/news/latest-news/github-and-how-the-ndr-uses-it/)
+| **[GitHub GIG Cymru](https://github.com/GIGCymru)** | Provides a collaborative home for analysts, developers, and data professionals across NHS Wales |
 
 ---
 
@@ -48,12 +36,13 @@ Repositories in this organisation include:
 
 ## Contributing & Access
 
-NHS Wales staff and approved collaborators can request access through the GitHub GIG Cymru service. External contributors may be included under controlled governance arrangements.
+NHS Wales staff and approved collaborators can request access through the [GitHub GIG Cymru service](https://github.com/GIGCymru). External contributors may be included under controlled governance arrangements.
 
 For more information:
 
 - 🌐 [National Data Resource — DHCW](https://dhcw.nhs.wales/our-programmes/national-data-resource1/)
 - 🌐 [Digital Health and Care Wales](https://dhcw.nhs.wales/)
+- 🌐 [GitHub GIG Cymru service](https://github.com/GIGCymru)
 - 🌐 [NHS Wales Solutions Exchange](https://gigcymru.github.io/Solutions-Exchange/)
 
 ---
