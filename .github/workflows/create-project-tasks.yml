@@ -1,0 +1,238 @@
+name: Create Project Board Tasks
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_url:
+        description: >
+          Optional: GitHub Project URL to add issues to
+          (e.g. https://github.com/orgs/National-Data-Resource/projects/1).
+          Leave blank to create issues without adding them to a project.
+        required: false
+        type: string
+
+jobs:
+  create-labels:
+    name: Create Labels
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Create category labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          create_label() {
+            local name="$1"
+            local description="$2"
+            local color="$3"
+            gh label create "$name" \
+              --description "$description" \
+              --color "$color" \
+              --repo "$GITHUB_REPOSITORY" 2>/dev/null \
+            || gh label edit "$name" \
+              --description "$description" \
+              --color "$color" \
+              --repo "$GITHUB_REPOSITORY" 2>/dev/null \
+            || true
+          }
+
+          create_label "Operating Model & Governance" \
+            "National consistency, governance, and operating model tasks" \
+            "0075ca"
+
+          create_label "Platform Enablement & Onboarding" \
+            "Platform setup, onboarding playbooks, and starter templates" \
+            "e4e669"
+
+          create_label "Technical Delivery & Standards" \
+            "Reusable pipeline patterns, IaC, CI/CD, and data modelling standards" \
+            "d93f0b"
+
+          create_label "Analytics & Insight" \
+            "Analytics patterns, dashboards, and visualisation standards" \
+            "0e8a16"
+
+  create-issues:
+    name: Create Issues
+    needs: create-labels
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    outputs:
+      issue_numbers: ${{ steps.collect.outputs.issue_numbers }}
+    steps:
+      - name: Create Operating Model & Governance issues
+        id: omg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LABEL="Operating Model & Governance"
+          declare -a TITLES=(
+            "National consistency and cross-team solution reuse models"
+            "Automated testing, validation and continuous delivery patterns"
+            "Governance: approvals, documentation, auditability and decision records"
+            "Evidence-based, agreed best practice"
+            "Federated standards board (data architecture, reporting, ADR approach)"
+          )
+          declare -a BODIES=(
+            "Define and document models for maintaining national consistency and enabling cross-team solution reuse across the NDR programme."
+            "Establish automated testing, validation, and continuous delivery patterns to ensure quality and reliability across all NDR services."
+            "Define governance processes covering approvals, documentation standards, auditability requirements, and architectural decision records."
+            "Curate and publish evidence-based, agreed best practices for use across the NDR programme and NHS Wales data teams."
+            "Establish a federated standards board to oversee data architecture, reporting standards, and the ADR (Architecture Decision Record) approach."
+          )
+          NUMBERS=""
+          for i in "${!TITLES[@]}"; do
+            NUMBER=$(gh issue create \
+              --title "${TITLES[$i]}" \
+              --body "${BODIES[$i]}" \
+              --label "$LABEL" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json number --jq '.number')
+            echo "Created issue #$NUMBER: ${TITLES[$i]}"
+            NUMBERS="$NUMBERS $NUMBER"
+          done
+          echo "numbers=$NUMBERS" >> "$GITHUB_OUTPUT"
+
+      - name: Create Platform Enablement & Onboarding issues
+        id: peo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LABEL="Platform Enablement & Onboarding"
+          declare -a TITLES=(
+            "End-to-end playbooks (project/repo structures, naming conventions)"
+            "Environment setup patterns (e.g. GCP projects, IAM, networking)"
+            "Data ingestion starter templates (source → storage → warehouse)"
+            "Access and security patterns (roles, service accounts)"
+            "Getting started reference implementations (minimum viable pipelines)"
+          )
+          declare -a BODIES=(
+            "Create comprehensive end-to-end playbooks covering project and repository structures, naming conventions, and onboarding procedures."
+            "Document and publish environment setup patterns for GCP projects, IAM configuration, networking, and related infrastructure components."
+            "Develop reusable data ingestion starter templates covering the full journey from source systems through storage to the data warehouse."
+            "Define and document access and security patterns including role definitions and service account management."
+            "Build and publish 'getting started' reference implementations demonstrating minimum viable data pipelines for common NDR use cases."
+          )
+          NUMBERS=""
+          for i in "${!TITLES[@]}"; do
+            NUMBER=$(gh issue create \
+              --title "${TITLES[$i]}" \
+              --body "${BODIES[$i]}" \
+              --label "$LABEL" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json number --jq '.number')
+            echo "Created issue #$NUMBER: ${TITLES[$i]}"
+            NUMBERS="$NUMBERS $NUMBER"
+          done
+          echo "numbers=$NUMBERS" >> "$GITHUB_OUTPUT"
+
+      - name: Create Technical Delivery & Standards issues
+        id: tds
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LABEL="Technical Delivery & Standards"
+          declare -a TITLES=(
+            "Reusable pipeline patterns (batch / core ingestion patterns)"
+            "CDR/NHS/FHIR Implementation Guide (incl. Data Quality)"
+            "Publish mapping guidance, inviting review"
+            "Infrastructure-as-Code modules (e.g. Terraform)"
+            "CI/CD templates (e.g. GCP Cloud Build)"
+            "Data modelling patterns (schemas, curated layers)"
+            "Data quality and validation rules"
+          )
+          declare -a BODIES=(
+            "Design and document reusable pipeline patterns for batch and core ingestion use cases across the NDR platform."
+            "Produce and maintain a comprehensive CDR/NHS/FHIR Implementation Guide including Data Quality guidance."
+            "Publish data mapping guidance and invite community review to ensure accuracy, completeness, and broad adoption."
+            "Develop reusable Infrastructure-as-Code modules (e.g. Terraform) for common NDR platform components."
+            "Create reusable CI/CD pipeline templates (e.g. GCP Cloud Build) to standardise delivery processes across NDR repositories."
+            "Define and document data modelling patterns covering schemas and curated data layers for the NDR platform."
+            "Define, document, and implement data quality and validation rules to ensure the integrity of NDR datasets."
+          )
+          NUMBERS=""
+          for i in "${!TITLES[@]}"; do
+            NUMBER=$(gh issue create \
+              --title "${TITLES[$i]}" \
+              --body "${BODIES[$i]}" \
+              --label "$LABEL" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json number --jq '.number')
+            echo "Created issue #$NUMBER: ${TITLES[$i]}"
+            NUMBERS="$NUMBERS $NUMBER"
+          done
+          echo "numbers=$NUMBERS" >> "$GITHUB_OUTPUT"
+
+      - name: Create Analytics & Insight issues
+        id: ai
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LABEL="Analytics & Insight"
+          declare -a TITLES=(
+            "Looker modelling patterns (views, explores, semantic layer)"
+            "Reusable dashboards and visualisation templates"
+            "Agreed forecasting and analytical approaches"
+            "Nationally agreed measures and definitions"
+            "Design, branding and accessibility standards for outputs"
+            "NHS Visualisation Standards (e.g. Making Data Count)"
+          )
+          declare -a BODIES=(
+            "Develop and document Looker modelling patterns covering views, explores, and the semantic layer for consistent analytics across NDR."
+            "Build and publish a library of reusable dashboard and visualisation templates for common NHS Wales analytical use cases."
+            "Define and document agreed forecasting and analytical approaches (e.g. demand forecasting) for use across NDR and NHS Wales."
+            "Establish and publish nationally agreed measures and definitions to ensure consistency in reporting across NHS Wales."
+            "Define design, branding, and accessibility standards for all analytical outputs to ensure consistent, inclusive, and professional presentation."
+            "Adopt and document NHS Visualisation Standards (e.g. Making Data Count) to align NDR outputs with national NHS guidance."
+          )
+          NUMBERS=""
+          for i in "${!TITLES[@]}"; do
+            NUMBER=$(gh issue create \
+              --title "${TITLES[$i]}" \
+              --body "${BODIES[$i]}" \
+              --label "$LABEL" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json number --jq '.number')
+            echo "Created issue #$NUMBER: ${TITLES[$i]}"
+            NUMBERS="$NUMBERS $NUMBER"
+          done
+          echo "numbers=$NUMBERS" >> "$GITHUB_OUTPUT"
+
+      - name: Collect all issue numbers
+        id: collect
+        env:
+          OMG: ${{ steps.omg.outputs.numbers }}
+          PEO: ${{ steps.peo.outputs.numbers }}
+          TDS: ${{ steps.tds.outputs.numbers }}
+          AI: ${{ steps.ai.outputs.numbers }}
+        run: |
+          ALL="$OMG $PEO $TDS $AI"
+          echo "issue_numbers=$ALL" >> "$GITHUB_OUTPUT"
+          echo "All issues created: $ALL"
+
+  add-to-project:
+    name: Add Issues to Project Board
+    needs: create-issues
+    if: inputs.project_url != ''
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Add issues to project
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBERS: ${{ needs.create-issues.outputs.issue_numbers }}
+          PROJECT_URL: ${{ inputs.project_url }}
+        run: |
+          for NUMBER in $ISSUE_NUMBERS; do
+            ISSUE_URL="https://github.com/$GITHUB_REPOSITORY/issues/$NUMBER"
+            echo "Adding issue #$NUMBER to project: $PROJECT_URL"
+            gh project item-add "$PROJECT_URL" \
+              --owner "$GITHUB_REPOSITORY_OWNER" \
+              --url "$ISSUE_URL" || true
+          done
